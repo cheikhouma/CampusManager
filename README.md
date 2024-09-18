@@ -5,5 +5,7 @@ Requiremets:
 python package :
 
       - sqlite3
-      - random
+      - random4
+      - tkinter
+      - tkcalendar
       
