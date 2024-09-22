@@ -57,7 +57,6 @@ def sort_by(column):
 
     # Vérifier que la colonne demandée existe dans le mapping
     if column not in column_mapping:
-        print(f"Erreur: La colonne '{column}' n'est pas reconnue.")
         return
 
     column_key = column_mapping[column]  # Récupérer la clé correspondante
@@ -166,6 +165,8 @@ style.configure('TLabel', font=('Arial', 12))
 style.configure('TButton', font=('Arial', 13, 'bold'), background='#007ACC', foreground='white')
 style.configure('Treeview', font=('Arial', 13))
 style.configure('Treeview.Heading', font=('Arial', 13))
+style.configure("Custom.TCheckbutton", font=("Arial", 14))  # Change font here
+
 
 # Création de la barre de menu
 menu_bar = tk.Menu(root)
@@ -223,7 +224,6 @@ tree.pack(side='left', fill='both', expand=True)
 
 # Fonction pour la gestion du tri
 def on_heading_click(col):
-    print(f"Trier par : {col}")  # Pour déboguer
     sort_by(col)
 
 

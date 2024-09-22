@@ -9,9 +9,57 @@ def open_add_student_window(parent, treeview, student_id=None):
 
     # Récupérer les données de l'étudiant à partir de la base de données en utilisant l'identifiant
     student_data = database.get_student_by_id(student_id) if student_id else None
+
+    from datetime import datetime
+
+        # Fonction pour ajouter un zéro devant jour/mois si nécessaire
+    def format_date_naissance(event=None):
+        try:
+            # Récupérer la date entrée
+            date_naissance = date_naissance_entry.get()
+
+            # Convertir la date en objet datetime
+            parsed_date = datetime.strptime(date_naissance, "%d-%m-%Y")
+
+            # Reformater la date en ajoutant des zéros si besoin
+            formatted_date = parsed_date.strftime("%d-%m-%Y")
+            
+            # Mettre à jour le champ avec la date correctement formatée
+            date_naissance_entry.delete(0, tk.END)
+            date_naissance_entry.insert(0, formatted_date)
+
+        except ValueError:
+            # Si la date n'est pas valide, ne rien faire ou afficher un message
+            messagebox.showerror("Erreur", "La date de naissance est invalide.")
+
+    # Lier l'événement à la fonction pour formater la date lorsqu'elle est changée
+    
+
+    def validate_fields():
+        if not nom_entry.get().strip():
+            messagebox.showerror("Erreur", "Le nom est requis.")
+            return False
+        if not prenom_entry.get().strip():
+            messagebox.showerror("Erreur", "Le prénom est requis.")
+            return False
+        if sexe_combobox.get() not in ["M", "F"]:
+            messagebox.showerror("Erreur", "Veuillez sélectionner un genre.")
+            return False
+        format_date_naissance()
+        if not telephone_entry.get().isdigit() or len(telephone_entry.get()) != 9:
+            messagebox.showerror("Erreur", "Le téléphone doit être un numéro valide de 9 chiffres.")
+            return False
+        if not any(var.get() for var in paiement_vars.values()):
+            messagebox.showerror("Erreur", "Veuillez sélectionner au moins un mois de paiement.")
+            return False
+        return True
+
+
     def submit_form():
+        if not validate_fields():
+            add_student_window.destroy()
         mois_coches = [mois_nom for mois_nom, var in paiement_vars.items() if var.get()]
-        print("Mois sélectionnés :", mois_coches)
+
         mois = student_data['location'] if student_data else {mois: False for mois in paiement_vars.keys()}
         
         # Mettre à jour le dictionnaire des paiements
@@ -19,7 +67,6 @@ def open_add_student_window(parent, treeview, student_id=None):
             mois[month] = month in mois_coches
         mois_lowercase = {month.lower(): status for month, status in mois.items()}
 
-        print(mois)
         data = {
             "id_etudiant": student_data['id_etudiant'] if student_data else None,
             "prenom": prenom_entry.get(),
@@ -51,6 +98,8 @@ def open_add_student_window(parent, treeview, student_id=None):
     style.configure('TLabel', font=('Arial', 12))
     style.configure('TEntry', font=('Arial', 13))
     style.configure('TButton', font=('Arial', 12), background='#007ACC', foreground='white')
+    style.configure("Custom.TCheckbutton", font=("Arial", 14))  
+
 
     # Cadre principal
     main_frame = ttk.Frame(add_student_window, padding="20")
@@ -64,7 +113,7 @@ def open_add_student_window(parent, treeview, student_id=None):
     def create_form_row(frame, text, row, widget, **kwargs):
         label = ttk.Label(frame, text=text)
         label.grid(row=row, column=0, sticky=tk.W, padx=10, pady=5)
-        entry = widget(frame, **kwargs)
+        entry = widget(frame, **kwargs, font=('Arial', 13, ))
         entry.grid(row=row, column=1, padx=10, pady=5, sticky=tk.EW)
         return entry
 
@@ -106,7 +155,7 @@ def open_add_student_window(parent, treeview, student_id=None):
     # Création des cases à cocher
     for idx, mois_nom in enumerate(mois.keys()):
         var = tk.BooleanVar(value=mois[mois_nom])  # Initialise avec la valeur du dictionnaire
-        cb = ttk.Checkbutton(paiement_frame, text=mois_nom, variable=var, command=lambda nom=mois_nom: update_dict(nom, var))
+        cb = ttk.Checkbutton(paiement_frame, text=mois_nom, style="Custom.TCheckbutton", variable=var, command=lambda nom=mois_nom: update_dict(nom, var))
         cb.grid(row=idx // columns, column=idx % columns, padx=10, pady=5, sticky=tk.W)
         paiement_vars[mois_nom] = var
     # Préremplissage des champs si un étudiant est sélectionné
@@ -128,7 +177,6 @@ def open_add_student_window(parent, treeview, student_id=None):
     # Bouton pour soumettre le formulaire
     submit_btn = ttk.Button(main_frame, text="Valider", command=submit_form)
     submit_btn.pack(pady=20)
-    print(add_student_window)
     # S'assurer que la fenêtre se ferme proprement
     return add_student_window
      
