@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 from tkinter import messagebox
 import database
+from datetime import datetime
 
 # Fonction pour ouvrir la fenêtre d'ajout/modification d'étudiant
 def open_add_student_window(parent, treeview, student_id=None):
@@ -10,7 +11,6 @@ def open_add_student_window(parent, treeview, student_id=None):
     # Récupérer les données de l'étudiant à partir de la base de données en utilisant l'identifiant
     student_data = database.get_student_by_id(student_id) if student_id else None
 
-    from datetime import datetime
 
         # Fonction pour ajouter un zéro devant jour/mois si nécessaire
     def format_date_naissance(event=None):
@@ -175,7 +175,7 @@ def open_add_student_window(parent, treeview, student_id=None):
             var.set(student_data['location'].get(mois_nom, False))
     
     # Bouton pour soumettre le formulaire
-    submit_btn = ttk.Button(main_frame, text="Valider", command=submit_form)
+    submit_btn = ttk.Button(main_frame, text="Enregistrer", command=submit_form)
     submit_btn.pack(pady=20)
     # S'assurer que la fenêtre se ferme proprement
     return add_student_window
