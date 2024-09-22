@@ -60,7 +60,28 @@ Avant d'exécuter l'application, assurez-vous d'avoir installé les prérequis s
 - Entrez des mots-clés dans le champ de recherche pour filtrer la liste des étudiants.
 
 ## Captures d'écran
-Ajoute ici des captures d'écran montrant l'interface de l'application.
+
+### 1. Page d'accueil
+![Page d'accueil](screenshots/Screenshot1.png)
+
+### 2. Formulaire d'ajout d'étudiant
+![Menu Fichier](screenshots/Screenshot2.png)
+
+### 3. Liste des étudiants
+![Menu étudiant](screenshots/Screenshot3.png)
+
+### 4. Formulaire de modification d'étudiant
+![Formulaire d'ajout d'étudiant](screenshots/Screenshot4.png)
+
+### 5. Sélection des paiements des mois
+![Formulaire de modification d'étudiant](screenshots/Screenshot5.png)
+
+### 6. Suppression 
+![Confirmation de la suppression](screenshots/Screenshot6.png)
+
+### 7. Résultat de la recherche
+![Confirmation de la suppression](screenshots/Screenshot7.png)
+
 
 ## Contributions
 Les contributions sont les bienvenues ! Si vous souhaitez améliorer l'application, veuillez :

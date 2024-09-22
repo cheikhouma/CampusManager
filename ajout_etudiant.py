@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from tkcalendar import DateEntry
 from tkinter import messagebox
 import database
-from datetime import datetime
 
 # Fonction pour ouvrir la fenêtre d'ajout/modification d'étudiant
 def open_add_student_window(parent, treeview, student_id=None):
@@ -12,28 +10,48 @@ def open_add_student_window(parent, treeview, student_id=None):
     student_data = database.get_student_by_id(student_id) if student_id else None
 
 
-        # Fonction pour ajouter un zéro devant jour/mois si nécessaire
-    def format_date_naissance(event=None):
+    
+    def format_date_naissance():
+        date_naissance = date_naissance_entry.get()
+
+        # Vérifier que la date a bien 10 caractères (jj-mm-aaaa)
+        if len(date_naissance) != 10 or date_naissance[2] != '-' or date_naissance[5] != '-':
+            messagebox.showerror("Erreur", "Le format de la date doit être jj-mm-aaaa. \nExemple: 02-01-2001")
+            return False
+
         try:
-            # Récupérer la date entrée
-            date_naissance = date_naissance_entry.get()
-
-            # Convertir la date en objet datetime
-            parsed_date = datetime.strptime(date_naissance, "%d-%m-%Y")
-
-            # Reformater la date en ajoutant des zéros si besoin
-            formatted_date = parsed_date.strftime("%d-%m-%Y")
+            # Découper la date en jour, mois et année
+            jour, mois, annee = date_naissance.split('-')
             
-            # Mettre à jour le champ avec la date correctement formatée
+            # Convertir en entiers pour vérifier la validité
+            jour = int(jour)
+            mois = int(mois)
+            annee = int(annee)
+
+            # Vérifier que le mois est entre 1 et 12
+            if mois < 1 or mois > 12:
+                raise ValueError("Mois invalide")
+
+            # Vérifier que l'année est valide
+            if annee < 1900:
+                raise ValueError("Année invalide")
+
+            # Si le jour ou le mois est inférieur à 10, ajouter un zéro devant
+            jour = f"{jour:02}"
+            mois = f"{mois:02}"
+
+            # Reformater la date au bon format
+            formatted_date = f"{jour}-{mois}-{annee}"
+
+            # Mettre à jour le champ de saisie avec la date formatée
             date_naissance_entry.delete(0, tk.END)
             date_naissance_entry.insert(0, formatted_date)
+            return True
 
         except ValueError:
-            # Si la date n'est pas valide, ne rien faire ou afficher un message
-            messagebox.showerror("Erreur", "La date de naissance est invalide.")
-
-    # Lier l'événement à la fonction pour formater la date lorsqu'elle est changée
-    
+            # Si la date est invalide, afficher un message d'erreur
+            messagebox.showerror("Erreur", "La date de naissance est invalide. Veuillez entrer une date valide au format jj-mm-aaaa.")
+            return False
 
     def validate_fields():
         if not nom_entry.get().strip():
@@ -45,7 +63,8 @@ def open_add_student_window(parent, treeview, student_id=None):
         if sexe_combobox.get() not in ["M", "F"]:
             messagebox.showerror("Erreur", "Veuillez sélectionner un genre.")
             return False
-        format_date_naissance()
+        if not format_date_naissance():  # Appel de la fonction pour vérifier et formater la date
+            return False
         if not telephone_entry.get().isdigit() or len(telephone_entry.get()) != 9:
             messagebox.showerror("Erreur", "Le téléphone doit être un numéro valide de 9 chiffres.")
             return False
@@ -58,6 +77,7 @@ def open_add_student_window(parent, treeview, student_id=None):
     def submit_form():
         if not validate_fields():
             add_student_window.destroy()
+            return
         mois_coches = [mois_nom for mois_nom, var in paiement_vars.items() if var.get()]
 
         mois = student_data['location'] if student_data else {mois: False for mois in paiement_vars.keys()}
@@ -90,7 +110,8 @@ def open_add_student_window(parent, treeview, student_id=None):
     # Création de la fenêtre d'ajout/modification
     add_student_window = tk.Toplevel(parent)
     add_student_window.title("Modifier un Étudiant" if student_data else "Ajouter un Étudiant")
-    add_student_window.geometry("500x800")
+    add_student_window.geometry("500x790")
+    add_student_window.iconbitmap('assets/manager.ico')
 
     # Configuration de style
     style = ttk.Style()
@@ -121,7 +142,7 @@ def open_add_student_window(parent, treeview, student_id=None):
     nom_entry = create_form_row(form_frame, "Nom", 0, ttk.Entry)
     prenom_entry = create_form_row(form_frame, "Prénom", 1, ttk.Entry)
     sexe_combobox = create_form_row(form_frame, "Sexe", 2, ttk.Combobox, values=["M", "F"], state="readonly")
-    date_naissance_entry = create_form_row(form_frame, "Date de Naissance", 3, DateEntry, date_pattern="dd-mm-yyyy", width=19)
+    date_naissance_entry = create_form_row(form_frame, "Date de Naissance", 3, ttk.Entry)
     adresse_entry = create_form_row(form_frame, "Adresse", 4, ttk.Entry)
     telephone_entry = create_form_row(form_frame, "Téléphone", 5, ttk.Entry)
 
@@ -164,7 +185,7 @@ def open_add_student_window(parent, treeview, student_id=None):
         nom_entry.insert(0, student_data['nom'])
         prenom_entry.insert(0, student_data['prenom'])
         sexe_combobox.set(student_data['genre'])
-        date_naissance_entry.set_date(student_data['date_naissance'])
+        date_naissance_entry.insert(0, student_data['date_naissance'])
         adresse_entry.insert(0, student_data['addresse'])
         telephone_entry.insert(0, student_data['telephone'])
         batiment_entry.set(student_data['batiment'])
