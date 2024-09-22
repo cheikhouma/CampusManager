@@ -21,7 +21,7 @@ Avant d'exécuter l'application, assurez-vous d'avoir installé les prérequis s
 - Les bibliothèques suivantes :
   - Tkinter (inclus avec Python)
   - SQLite3 (inclus avec Python)
-  - [Autres bibliothèques si nécessaire : spécifie-les]
+
 
 ## Installation
 
