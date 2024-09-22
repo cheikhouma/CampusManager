@@ -27,7 +27,7 @@ Avant d'exécuter l'application, assurez-vous d'avoir installé les prérequis s
 
 1. Clonez ce dépôt :
    ```bash
-   git clone https://github.com/cheikhouma/campusmanager.git
+   git clone https://github.com/cheikhouma/CampusManager.git
    ```
 
 2. Accédez au répertoire cloné :
