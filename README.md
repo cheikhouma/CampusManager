@@ -13,6 +13,7 @@ Cette application de gestion des hébergements pour un campus social permet de g
 - Trier les données selon différents critères (nom, bâtiment, chambre, etc.).
 - Interface intuitive avec recherche intégrée.
 - Gestion automatique des identifiants d'étudiants via SQLite.
+- Exportations des donnees en format excel
 
 ## Prérequis
 Avant d'exécuter l'application, assurez-vous d'avoir installé les prérequis suivants :

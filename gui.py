@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import ajout_etudiant  # Importer le fichier ajout_etudiant
 import database  # Assurez-vous d'importer votre module de base de données
-
+import pandas as pd
 
 def create_gui():
     def open_add_student_page():
@@ -13,6 +13,43 @@ def create_gui():
         actualiser()
 
 
+    def export_to_excel():
+        try:
+            # Retrieve the students' data
+            students = database.get_students_from_db()
+
+            # Prepare the data for export
+            formatted_students = []
+
+            for student in students:
+                # Base information (single line per student)
+                base_info = {
+                    "Identifiant": student['id_etudiant'],
+                    "Nom": student['nom'],
+                    "Prénom": student['prenom'],
+                    "Sexe": student['genre'],
+                    "Date de Naissance": student['date_naissance'],
+                    "Téléphone": student['telephone'],
+                    "Adresse": student['addresse'],
+                    "Bâtiment": student['batiment'],
+                    "Chambre": student['chambre']
+                }
+
+                # For each month, add a row with payment status
+                for month, paid in student['location'].items():
+                    month_info = base_info.copy()  # Copy base info
+                    month_info["Mois"] = month.capitalize()
+                    month_info["Statut de Paiement"] = "Payé" if paid else "Non payé"
+                    formatted_students.append(month_info)
+
+            # Convert to DataFrame and save to Excel
+            df = pd.DataFrame(formatted_students)
+            df.to_excel("students_data.xlsx", index=False)
+            messagebox.showinfo("Exportation réussie",
+                                "Les données ont été exportées avec succès dans 'students_data.xlsx'")
+
+        except Exception as e:
+            messagebox.showerror("Erreur d'exportation", f"Une erreur s'est produite lors de l'exportation : {e}")
 
     def actualiser():
         global students
@@ -33,7 +70,7 @@ def create_gui():
 
     def sort_by(column):
         global sort_column, sort_order
-
+        students = database.get_students_from_db()
         # Déterminer l'ordre de tri
         if sort_column == column:
             sort_order = "desc" if sort_order == "asc" else "asc"
@@ -48,7 +85,7 @@ def create_gui():
             "Identifiant": "id_etudiant",
             "Nom": "nom",
             "Prénom": "prenom",
-            "Sexe": "genre",
+            "Genre": "genre",
             "Date de Naissance": "date_naissance",
             "Adresse": "addresse",
             "Téléphone": "telephone",
@@ -165,6 +202,8 @@ def create_gui():
 
     root.iconbitmap('assets/manager.ico')
 
+
+
     # Style personnalisé
     style = ttk.Style()
     style.theme_use('clam')
@@ -181,14 +220,16 @@ def create_gui():
 
     # Menu "Fichier"
     fichier_menu = tk.Menu(menu_bar, tearoff=0)
-    menu_bar.add_cascade(label="Fichier", menu=fichier_menu)
+    menu_bar.add_cascade(label="Fichier", menu=fichier_menu, font=(20))
     fichier_menu.add_command(label="Actualiser", command=actualiser)
+    fichier_menu.add_separator()
+    fichier_menu.add_command(label="Exporter en Excel", command=export_to_excel)
     fichier_menu.add_separator()
     fichier_menu.add_command(label="Quitter", command=root.quit)
 
     # Menu "Ajouter"
     etudiant = tk.Menu(menu_bar, tearoff=0)
-    menu_bar.add_cascade(label="Étudiant", menu=etudiant)
+    menu_bar.add_cascade(label="Étudiant", menu=etudiant, font=(20))
     etudiant.add_command(label="Ajouter", command=open_add_student_page)
     etudiant.add_separator()
     etudiant.add_command(label="Modifier", command=modify_student)
@@ -232,7 +273,7 @@ def create_gui():
     tree_frame.pack(pady=20, fill='both', expand=True)
 
     # Création de la Treeview
-    columns = ("Identifiant", "Nom", "Prénom", "Sexe", "Date de Naissance", "Téléphone", "Adresse", "Bâtiment", "Chambre", "Loyer")
+    columns = ("Identifiant", "Nom", "Prénom", "Genre", "Date de Naissance", "Téléphone", "Adresse", "Bâtiment", "Chambre", "Loyer")
 
     tree = ttk.Treeview(tree_frame, columns=columns, show="headings")
     tree.pack(side='left', fill='both', expand=True)

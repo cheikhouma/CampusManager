@@ -9,8 +9,10 @@ def open_add_student_window(parent, treeview, student_id=None):
     # Récupérer les données de l'étudiant à partir de la base de données en utilisant l'identifiant
     student_data = database.get_student_by_id(student_id) if student_id else None
 
+    # Rendre la fenêtre modale (non visible dans la barre des tâches et interaction restreinte)
 
-    
+
+
     def format_date_naissance():
         date_naissance = date_naissance_entry.get()
 
@@ -22,7 +24,7 @@ def open_add_student_window(parent, treeview, student_id=None):
         try:
             # Découper la date en jour, mois et année
             jour, mois, annee = date_naissance.split('-')
-            
+
             # Convertir en entiers pour vérifier la validité
             jour = int(jour)
             mois = int(mois)
@@ -76,12 +78,12 @@ def open_add_student_window(parent, treeview, student_id=None):
 
     def submit_form():
         if not validate_fields():
-            add_student_window.destroy()
             return
+
         mois_coches = [mois_nom for mois_nom, var in paiement_vars.items() if var.get()]
 
         mois = student_data['location'] if student_data else {mois: False for mois in paiement_vars.keys()}
-        
+
         # Mettre à jour le dictionnaire des paiements
         for month in mois.keys():
             mois[month] = month in mois_coches
@@ -103,7 +105,7 @@ def open_add_student_window(parent, treeview, student_id=None):
         # Sauvegarde dans la base de données
         database.save_student_to_db(data)
 
-        # Fermer la fenêtre après la soumission
+        # Fermeture de la fenêtre après la soumission
         add_student_window.destroy()
 
 
@@ -113,13 +115,17 @@ def open_add_student_window(parent, treeview, student_id=None):
     add_student_window.geometry("500x790")
     add_student_window.iconbitmap('assets/manager.ico')
 
+    # Rendre la fenêtre modale (non visible dans la barre des tâches et interaction restreinte)
+    add_student_window.transient(parent)
+    add_student_window.grab_set()
+
     # Configuration de style
     style = ttk.Style()
     style.theme_use('clam')
     style.configure('TLabel', font=('Arial', 12))
     style.configure('TEntry', font=('Arial', 13))
     style.configure('TButton', font=('Arial', 12), background='#007ACC', foreground='white')
-    style.configure("Custom.TCheckbutton", font=("Arial", 14))  
+    style.configure("Custom.TCheckbutton", font=("Arial", 14))
 
 
     # Cadre principal
@@ -157,7 +163,7 @@ def open_add_student_window(parent, treeview, student_id=None):
     paiement_frame.pack(padx=20, pady=10, fill='x')
 
     # Initialisation des mois (ici on utilise une liste de mois pour l'exemple)
-    mois_noms = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 
+    mois_noms = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin',
                  'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre']
 
     # Si l'étudiant est nouveau, on initialise avec tous les mois à False
@@ -194,10 +200,9 @@ def open_add_student_window(parent, treeview, student_id=None):
         # Load the payment data
         for mois_nom, var in paiement_vars.items():
             var.set(student_data['location'].get(mois_nom, False))
-    
+
     # Bouton pour soumettre le formulaire
     submit_btn = ttk.Button(main_frame, text="Enregistrer", command=submit_form)
     submit_btn.pack(pady=20)
     # S'assurer que la fenêtre se ferme proprement
     return add_student_window
-     

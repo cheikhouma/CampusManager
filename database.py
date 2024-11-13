@@ -51,7 +51,6 @@ def get_student_by_id(student_id):
                 'decembre': bool(student_data[20])
             }
         }
-
     return None  # Retourner None si aucun étudiant n'est trouvé
 
 
@@ -231,3 +230,5 @@ def delete_student_by_id(student_id):
     finally:
         conn.close()
 
+
+print(get_students_from_db())
